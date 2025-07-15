@@ -1,3 +1,5 @@
+// PdfRenderPlugin.kt
+
 package jp.espresso3389.pdf_render
 
 import android.graphics.Bitmap
@@ -8,21 +10,17 @@ import android.graphics.pdf.PdfRenderer
 import android.graphics.pdf.PdfRenderer.Page.RENDER_MODE_FOR_PRINT
 import android.os.ParcelFileDescriptor
 import android.os.ParcelFileDescriptor.MODE_READ_ONLY
-//import android.util.Log
 import android.util.SparseArray
 import android.view.Surface
 import androidx.annotation.NonNull
-import androidx.collection.LongSparseArray
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
 import io.flutter.view.TextureRegistry
 import java.io.File
 import java.io.OutputStream
-import java.nio.Buffer
 import java.nio.ByteBuffer
 
 /** PdfRenderPlugin */
@@ -49,7 +47,7 @@ class PdfRenderPlugin: FlutterPlugin, MethodCallHandler {
       when {
         call.method == "file" -> {
           val pdfFilePath = call.arguments as String
-          result.success(registerNewDoc(openFileDoc(call.arguments as String)))
+          result.success(registerNewDoc(openFileDoc(pdfFilePath)))
         }
         call.method == "asset" -> {
           result.success(registerNewDoc(openAssetDoc(call.arguments as String)))
@@ -134,7 +132,7 @@ class PdfRenderPlugin: FlutterPlugin, MethodCallHandler {
         writeData(it)
       }
       file.inputStream().use {
-        return PdfRenderer(ParcelFileDescriptor.dup(it.fd))
+        return PdfRenderer(ParcelFileDescriptor.open(file, MODE_READ_ONLY))
       }
     } finally {
       file.delete()
@@ -143,8 +141,6 @@ class PdfRenderPlugin: FlutterPlugin, MethodCallHandler {
 
   private fun openAssetDoc(pdfAssetName: String): PdfRenderer {
     val key = flutterPluginBinding.flutterAssets.getAssetFilePathByName(pdfAssetName)
-    // NOTE: the input stream obtained from asset may not be
-    // a file stream and we should convert it to file
     flutterPluginBinding.applicationContext.assets.open(key).use { input ->
       return copyToTempFileAndOpenDoc { input.copyTo(it) }
     }
