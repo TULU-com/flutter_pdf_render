@@ -1,7 +1,6 @@
 group 'jp.espresso3389.pdf_render'
 version '1.0-SNAPSHOT'
 
-
 buildscript {
     ext.kotlin_version = '1.6.10'
     repositories {
@@ -41,17 +40,15 @@ android {
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
-            // הוספת תמיכה ב-16KB
-            cppFlags "-DANDROID_16KB_PAGE_SIZE=1"
+            // הוספת תמיכה ב-16KB - רק arguments v2
             arguments "-DANDROID_16KB_PAGE_SIZE=1"
         }
     }
     defaultConfig {
         minSdkVersion 21
-        // הוספת תמיכה ב-16KB
+        // הוספת תמיכה ב-16KB - רק arguments
         externalNativeBuild {
             cmake {
-                cppFlags "-DANDROID_16KB_PAGE_SIZE=1"
                 arguments "-DANDROID_16KB_PAGE_SIZE=1"
             }
         }
@@ -68,8 +65,4 @@ android {
         // Force 16KB page size alignment for native libraries
         pickFirsts += ['**/libbbhelper.so', '**/libmodpdfium.so', '**/libmodpng.so', '**/libmodft2.so']
     }
-}
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
