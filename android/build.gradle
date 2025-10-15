@@ -29,8 +29,8 @@ android {
         namespace("jp.espresso3389.pdf_render")
     }
     
-    compileSdkVersion 31
-     
+    compileSdkVersion 36  // עדכון מ-31 ל-36
+    
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -40,13 +40,32 @@ android {
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
+            // הוספת תמיכה ב-16KB
+            cppFlags "-DANDROID_16KB_PAGE_SIZE=1"
+            arguments "-DANDROID_16KB_PAGE_SIZE=1"
         }
     }
     defaultConfig {
         minSdkVersion 21
+        // הוספת תמיכה ב-16KB
+        externalNativeBuild {
+            cmake {
+                cppFlags "-DANDROID_16KB_PAGE_SIZE=1"
+                arguments "-DANDROID_16KB_PAGE_SIZE=1"
+            }
+        }
     }
     lintOptions {
         disable 'InvalidPackage'
+    }
+    
+    // הוספת תמיכה ב-16KB page sizes
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+        // Force 16KB page size alignment for native libraries
+        pickFirsts += ['**/libbbhelper.so', '**/libmodpdfium.so', '**/libmodpng.so', '**/libmodft2.so']
     }
 }
 
