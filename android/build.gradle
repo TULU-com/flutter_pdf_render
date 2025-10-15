@@ -40,10 +40,18 @@ android {
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
+            // הוספת תמיכה ב-16KB - העברת הגדרה ל-CMake
+            arguments "-DANDROID_16KB_PAGE_SIZE=1"
         }
     }
     defaultConfig {
         minSdkVersion 21
+        // הוספת תמיכה ב-16KB - העברת הגדרה ל-CMake
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_16KB_PAGE_SIZE=1"
+            }
+        }
     }
     lintOptions {
         disable 'InvalidPackage'
