@@ -1,6 +1,6 @@
 group 'jp.espresso3389.pdf_render'
 version '1.0-SNAPSHOT'
-// V2
+// V3
 buildscript {
     ext.kotlin_version = '1.6.10'
     repositories {
@@ -40,18 +40,10 @@ android {
     externalNativeBuild {
         cmake {
             path "CMakeLists.txt"
-            // הוספת תמיכה ב-16KB - רק arguments
-            arguments "-DANDROID_16KB_PAGE_SIZE=1"
         }
     }
     defaultConfig {
         minSdkVersion 21
-        // הוספת תמיכה ב-16KB - רק arguments
-        externalNativeBuild {
-            cmake {
-                arguments "-DANDROID_16KB_PAGE_SIZE=1"
-            }
-        }
     }
     lintOptions {
         disable 'InvalidPackage'
