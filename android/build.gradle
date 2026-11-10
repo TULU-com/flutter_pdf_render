@@ -22,17 +22,28 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+
+// AGP 9 compiles Kotlin itself and rejects the Kotlin Gradle plugin, unless the app
+// opts out with android.builtInKotlin=false (the default in Flutter's app template).
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+def builtInKotlin = agpMajor >= 9 &&
+    project.findProperty('android.builtInKotlin')?.toString() != 'false'
+if (!builtInKotlin) {
+    apply plugin: 'kotlin-android'
+}
 
 android {
     if (project.android.hasProperty("namespace")) {
         namespace("jp.espresso3389.pdf_render")
     }
-    
+
     compileSdkVersion 36  // עדכון מ-31 ל-36
-    
-    kotlinOptions {
-        jvmTarget = '1.8'
+
+    // Java and Kotlin must compile to the same JVM target. AGP 9 defaults Java to 11,
+    // so both are set explicitly (Kotlin below, in the kotlin block).
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -56,5 +67,11 @@ android {
         }
         // Force 16KB page size alignment for native libraries
         pickFirsts += ['**/libbbhelper.so', '**/libmodpdfium.so', '**/libmodpng.so', '**/libmodft2.so']
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
